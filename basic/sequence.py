@@ -6,11 +6,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-n = 100  # 序列长度
-start = 3000  # 序列起始值
-factor = 0.3 #参数阿尔法
-
-
+# 生成一个时间序列，n 为长度，start 为起始项， factor 为参数阿尔法
 def generate_sequence(n,start,factor):
     rd = np.random.normal(loc=0.0, scale=1.0, size=n)  # 生成一个标准正态分布序列,长度为N
     sequence = np.zeros(n, dtype=float)  # 生成一个全为0，长度为N的array
