@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 # @author: Xiao Huang
 
-import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
+
 
 # 生成一个时间序列，n 为长度，start 为起始项， factor 为参数阿尔法
 def generate_sequence(n,start,factor):
@@ -20,7 +20,7 @@ def generate_sequence(n,start,factor):
     return sequence
 
 if __name__=='__main__':
-    s1 = generate_sequence(10,3000,0.8)
+    s1 = generate_sequence(100,0,-0.2)
     print(s1)
     plt.plot(s1)
     plt.show()
