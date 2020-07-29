@@ -13,7 +13,6 @@ import scipy.stats as scs
 import statsmodels.api as sm
 import statsmodels.tsa.api as smt
 
-
 # @pysnooper.snoop()
 # 打印之后lags阶数的ACF,PACF
 def tsplot(y, lags=None, figsize=(10, 8), style='bmh'):
@@ -24,6 +23,7 @@ def tsplot(y, lags=None, figsize=(10, 8), style='bmh'):
         layout = (4, 2)  # 配置layout
         ts_ax = plt.subplot2grid(layout, (0, 0), colspan=2)
         hist_ax = plt.subplot2grid(layout, (3, 0))
+        kde_zx = plt.subplot2grid(layout, (3, 1))
         acf_ax = plt.subplot2grid(layout, (1, 0))
         pacf_ax = plt.subplot2grid(layout, (1, 1))
         qq_ax = plt.subplot2grid(layout, (2, 0))
@@ -32,9 +32,10 @@ def tsplot(y, lags=None, figsize=(10, 8), style='bmh'):
         y.plot(ax=ts_ax)
         ts_ax.set_title('Time Series Analysis Plots')
         y.plot(ax=hist_ax, kind='hist', bins=25)
+        y.plot(ax=kde_zx, kind='kde')
         hist_ax.set_title('Histogram')
-        smt.graphics.plot_acf(y, lags=lags, ax=acf_ax, alpha=0.5)  # 自相关系数ACF图
-        smt.graphics.plot_pacf(y, lags=lags, ax=pacf_ax, alpha=0.5)  # 偏相关系数PACF图
+        smt.graphics.plot_acf(y, lags=lags, ax=acf_ax)  # 自相关系数ACF图
+        smt.graphics.plot_pacf(y, lags=lags, ax=pacf_ax)  # 偏相关系数PACF图
         sm.qqplot(y, line='s', ax=qq_ax)  # QQ图检验是否是正太分布
         qq_ax.set_title('QQ Plot')
         scs.probplot(y, sparams=(y.mean(), y.std()), plot=pp_ax)
@@ -51,16 +52,26 @@ def acf_and_pacf(y, lags=None):
     out = np.c_[range(1, lags + 1), acf[1:], pacf[1:], q, p]
     output = pd.DataFrame(out, columns=['lag', "ACF", "PACF", "Q", "P-value"])
     output = output.set_index('lag')
+    print(output)
     return output
 
-
+# ADF 单位根检验
 def adf_test(ts):
     adftest = sm.tsa.adfuller(ts)
     adf_res = pd.Series(adftest[0:4], index=['Test Statistic', 'p-value', 'Lags Used', 'Number of Observations Used'])
     for key, value in adftest[4].items():
         adf_res['Critical Value (%s)' % key] = value
+    print(adf_res)
     return adf_res
 
+#AIC 信息准则 定阶
+def adf_aic(ts):
+    adftest = sm.tsa.adfuller(ts, autolag='AIC')
+    adf_res = pd.Series(adftest[0:4], index=['Test Statistic','p-value','Lags Used','Number of Observations Used'])
+    for key, value in adftest[4].items():
+        adf_res['Critical Value (%s)' % key] = value
+    print(int(adf_res['Lags Used']))
+    return adf_res
 
 if __name__ == "__main__":
     data = pd.read_csv("c:/apache/daily-minimum-temperatures-in-me.csv", index_col='Date')
